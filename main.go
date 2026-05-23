@@ -64,9 +64,12 @@ func getConfigFilePath() cmdarg.Arg {
 	}
 
 	if workingDir, err := os.Getwd(); err == nil {
-		defaultConfig := filepath.Join(workingDir, "config.json")
-		if fileExists(defaultConfig) {
-			return cmdarg.Arg{defaultConfig}
+		// Also check for config.yaml and config.yml in the working directory
+		for _, name := range []string{"config.json", "config.yaml", "config.yml"} {
+			defaultConfig := filepath.Join(workingDir, name)
+			if fileExists(defaultConfig) {
+				return cmdarg.Arg{defaultConfig}
+			}
 		}
 	}
 
@@ -131,13 +134,4 @@ func main() {
 
 	<-osSignals
 	fmt.Println("V2Ray shutting down.")
-}
-
-func printVersion() {
-	version := core.VersionStatement()
-	for _, s := range version {
-		fmt.Println(s)
-	}
-	fmt.Printf("Go runtime: %s\n", runtime.Version())
-	fmt.Printf("OS/Arch: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 }
